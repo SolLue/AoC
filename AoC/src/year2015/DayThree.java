@@ -14,12 +14,7 @@ public class DayThree {
 		FileReader fr = new FileReader(folder + "/year2015/input/day3.txt");
 		BufferedReader br = new BufferedReader(fr);
 
-		List<String> input = new ArrayList<String>();
-		String temp = br.readLine();
-		while(temp != null) {
-			input.add(temp);
-			temp = br.readLine();
-		}
+		String input = br.readLine();
 		br.close();
 		
 		
