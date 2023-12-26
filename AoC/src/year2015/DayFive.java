@@ -28,7 +28,6 @@ public class DayFive {
 
 		counterNice = getPart2(input);
 		System.out.println("Day Five, Part Two: " + counterNice);
-
 	}
 
 	static int getPart1(List<String> input) {
