@@ -13,7 +13,22 @@ public class Coordinate {
 		return new Coordinate(this.x + direction.x, this.y + direction.y);
 	}
 	
-	public int manhattenDistance(Coordinate coord) {
-		return Math.abs(this.x - coord.x) + Math.abs(this.y - coord.y);
-	}
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(this.x).hashCode() + Integer.valueOf(this.y).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+    	Coordinate c = (Coordinate) o;
+    	if(this.x == c.x && this.y == c.y) {
+    		return true; 
+    	}
+    	return false;
+    }
+    
+    @Override
+    public String toString() {
+    	return "[" + this.x + ", " + this.y + "]";
+    }
 }
