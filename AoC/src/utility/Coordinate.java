@@ -9,6 +9,14 @@ public class Coordinate {
 		this.y = y; 
 	}
 	
+	public int getX() {
+		return this.x;
+	}
+	
+	public int getY() {
+		return this.y;
+	}
+	
 	public Coordinate move(Direction direction) {
 		return new Coordinate(this.x + direction.x, this.y + direction.y);
 	}

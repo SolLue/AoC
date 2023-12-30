@@ -10,8 +10,7 @@ import java.util.List;
 import utility.Property;
 
 public class DayEight {
-	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-
+	public static void main(String[] args) throws IOException {
 		String folder = Property.getFilePathHome();
 		FileReader fr = new FileReader(folder + "/year2015/input/day8.txt");
 		BufferedReader br = new BufferedReader(fr);
@@ -33,7 +32,6 @@ public class DayEight {
 			int count = 0; 
 			int count2 = 0; 
 			for(int i = 0; i < string.length(); i++) {
-				//		System.out.print(string.charAt(i));
 				if(string.charAt(i) == '\\') {
 					if(string.charAt(i + 1) == 'x') {
 						if(string.substring(i + 1, i + 4).matches("[x][0-9a-fA-F]+")) {
@@ -54,7 +52,6 @@ public class DayEight {
 					count2++;
 				}
 			}
-			// 2 because of " " in front and back
 			difference1 += count - 2;
 			difference2 += count2 + 2; 
 		}
