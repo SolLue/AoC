@@ -80,12 +80,8 @@ public class DayNine {
 			}
 			costs.add(cost);
 		}
-
-
+		
 		System.out.println("Day Nine, Part One: " + Collections.min(costs));
 		System.out.println("Day Nine, Part Two: " + Collections.max(costs));
 	}
-
-
-
 }
