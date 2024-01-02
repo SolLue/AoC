@@ -37,7 +37,7 @@ public class PathfindingAlg<T> {
 		return p; 
 	}
 
-	public List<Map<Node, Integer>> getAllPaths(GraphWeighted graph, Node source, int steps) { //Node destination) {
+	public List<Map<Node, Integer>> getAllPaths(GraphWeighted graph, Node source, int steps) { 
 		List<Map<Node, Integer>> paths = new ArrayList<Map<Node, Integer>>();
 		recursiveGetPaths(graph, source, paths, new LinkedHashMap<Node, Integer>(), steps, 0, 0); //destination, paths, new LinkedHashSet<Node>());
 		return paths;
@@ -59,11 +59,40 @@ public class PathfindingAlg<T> {
 		for (Node e : edges.keySet()) {
 			if (!path.containsKey(e)) {
 				currentcost = edges.get(e);
-				recursiveGetPaths(graph, e, paths, path, steps, amount, currentcost);//destination, paths, path);
+				recursiveGetPaths(graph, e, paths, path, steps, amount, currentcost);
 			}
 		}
 		path.remove(current);
 	}
+
+	public List<Map<Node, Integer>> getAllPathsDestination(GraphWeighted graph, Node source,
+			Node destination) {
+		List<Map<Node, Integer>> paths = new ArrayList<Map<Node, Integer>>();
+		recursiveGetPathsDestination(graph, source, paths, new LinkedHashMap<Node, Integer>(), destination, 0); 
+		return paths;
+	}
+
+	private void recursiveGetPathsDestination(GraphWeighted graph, Node current, List<Map<Node, 
+			Integer>> paths, LinkedHashMap<Node, Integer> path, Node destination, int currentcost) {
+		path.put(current, currentcost);
+
+		if(current.equals(destination)) {
+			paths.add(new HashMap<Node, Integer>(path));
+			path.remove(current);
+			return; 
+		}
+
+		Map<Node, Integer> edges = graph.getEdgesOfNode(current);
+
+		for (Node e : edges.keySet()) {
+			if (!path.containsKey(e)) {
+				currentcost = edges.get(e);
+				recursiveGetPathsDestination(graph, e, paths, path, destination, currentcost);
+			}
+		}
+		path.remove(current);
+	}
+
 
 	public List<Coordinate> bfs_grid_ObstacleList(GraphSquare graph, Coordinate start) {
 		Queue<Coordinate> path = new LinkedList<Coordinate>(); 
