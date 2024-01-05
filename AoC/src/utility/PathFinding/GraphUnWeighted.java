@@ -22,9 +22,21 @@ public class GraphUnWeighted<T> {
 	public Map<T, List<T>> getGraph() {
 		return this.edges;
 	}
-
-	// do something with the weight later
-	public boolean addEdge(T current, T edge, int weight) {
+	
+	public Node getNode(String s) {
+		Node n = new Node(s);
+		if(edges.containsKey(n))
+			return n;
+		return null; 
+	}
+	
+	public Node getNode(Node n) {
+		if(edges.containsKey(n))
+			return n;
+		return null; 
+	}
+	
+	public boolean addEdge(T current, T edge) {
 		if(edges.containsKey(current)) {
 			List<T> temp = this.edges.get(current);
 			temp.add(edge);
@@ -42,6 +54,11 @@ public class GraphUnWeighted<T> {
 		return false;
 	}
 
+	public List<T> getEdgesOfNode(T current) {
+		if(edges.containsKey(current))
+			return edges.get(current);
+		return null; 
+	}
 
 
 
