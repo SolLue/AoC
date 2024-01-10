@@ -40,16 +40,15 @@ public class DayTwentyTwo {
 		long time = System.currentTimeMillis();
 		int min = bfs(spells, boss, hardmode);
 		long time1 = System.currentTimeMillis();
-		System.out.println("Day TwentyOne, Part One: " + min);
+		System.out.println("Day TwentyTwo, Part One: " + min);
 		System.out.println("Took " + ((time1 - time) / 1000) + " seconds");
 
 		hardmode = true; 
 		time = System.currentTimeMillis();
 		min = bfs(spells, boss, hardmode);
 		time1 = System.currentTimeMillis();
-		System.out.println("Day TwentyOne, Part Two: " + min);
+		System.out.println("Day TwentyTwo, Part Two: " + min);
 		System.out.println("Took " + (time1 - time) + " milliseconds");
-
 	}
 
 	static int bfs(Set<Spell> spells, Map<String, Integer> boss, boolean hardmode) {
