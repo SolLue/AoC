@@ -86,5 +86,4 @@ public class DayTwo {
 		int[] arr = new int[] {current.getX(), current.getY()};
 		return arr; 
 	}
-
 }
