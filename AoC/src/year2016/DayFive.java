@@ -19,9 +19,7 @@ public class DayFive {
 		br.close();
 
 		String[] code = getCode(input);
-
 		System.out.println("Day Five, Part One: " + code[0]);	
-
 		System.out.println("Day Five, Part Two: " + code[1]);
 	}
 
@@ -58,7 +56,6 @@ public class DayFive {
 					if(part1.length() == 8)
 						password1 = true; 
 				}
-
 				if(!password2) {
 					int index = Character.getNumericValue(hashtext.charAt(5));
 					if(index < 8 && part2char[index] == '-') {
@@ -75,7 +72,6 @@ public class DayFive {
 				num++;
 			}
 		}
-
 		code[0] = part1; 
 		String part2 = new String(part2char);
 		code[1] = part2;
