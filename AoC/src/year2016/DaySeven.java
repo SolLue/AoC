@@ -22,12 +22,12 @@ public class DaySeven {
 		}
 		br.close();
 
-		int[] amount = tlsChecking(input);
+		int[] amount = tlsSslChecking(input);
 		System.out.println("Day Seven, Part One: " + amount[0]);
 		System.out.println("Day Seven, Part Two: " + amount[1]);
 	}
 
-	static int[] tlsChecking(List<String> input) {
+	static int[] tlsSslChecking(List<String> input) {
 		int countabba = 0; 
 		int countaba = 0; 
 
