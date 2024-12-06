@@ -77,7 +77,7 @@ public class DayFour {
 				}
 			}
 		}
-		
+
 		List<Guard> guards = new ArrayList<Guard>();
 		for (Integer key : guardsAsleep.keySet()) {
 			List<int[]> sleep = guardsAsleep.get(key);
@@ -90,12 +90,42 @@ public class DayFour {
 		}
 
 		Guard highestSleeper = guards.stream()
-						.max(Comparator.comparing(Guard::getAmount))
-						.orElseThrow(NoSuchElementException::new);
+				.max(Comparator.comparing(Guard::getAmount))
+				.orElseThrow(NoSuchElementException::new);
+
+		Map<Integer, Integer> amountMinutes = calculateAmountMinuted(highestSleeper);
+
+		int[] commonMinute = findMostCommonMinute(amountMinutes); 
+
+		System.out.println("Day Four, Part One: " + (commonMinute[0] * highestSleeper.id));
+
+
+
+		Map<Integer, int[]> compileGuard = new HashMap<Integer, int[]>();
+		for (Guard guard : guards) {
+			amountMinutes = calculateAmountMinuted(guard);
+
+			int[] min = findMostCommonMinute(amountMinutes);
+			compileGuard.put(guard.id, min);
+		}
+
+		int max = 0;
+		int guard = 0;
+		int commonM = 0; 
+		for (Integer guardId : compileGuard.keySet()) {
+			if(compileGuard.get(guardId)[1] > max) {
+				max = compileGuard.get(guardId)[1];
+				guard = guardId;
+				commonM = compileGuard.get(guardId)[0];
+			}
+		}
 		
-		
+		System.out.println("Day Four, Part Two: " + (guard * commonM));
+	}
+
+	private static Map<Integer, Integer> calculateAmountMinuted(Guard guard) {
 		Map<Integer, Integer> amountMinutes = new HashMap<Integer, Integer>();
-		for (int i : highestSleeper.sleepytimes) {
+		for (int i : guard.sleepytimes) {
 			if(!amountMinutes.containsKey(i)) {
 				amountMinutes.put(i, 1);
 			} else {
@@ -104,27 +134,26 @@ public class DayFour {
 				amountMinutes.put(i, m);	
 			}
 		}
-		
+		return amountMinutes;
+	}
+
+	static int[] findMostCommonMinute(Map<Integer, Integer> amountMinutes) {
 		int max = 0;
-		int keyMin = 0;
-		for (Integer key : amountMinutes.keySet()) {
-			if(amountMinutes.get(key) > max) {
-				max = amountMinutes.get(key);
-				keyMin = key;
+		int commonMinute = 0;
+		for (Integer minute : amountMinutes.keySet()) {
+			if(amountMinutes.get(minute) > max) {
+				max = amountMinutes.get(minute);
+				commonMinute = minute;
 			}
 		}
-
-		
-		System.out.println("Day Four, Part One: " + (keyMin * highestSleeper.id));
-
-		System.out.println("Day Four, Part Two: " + 0);
+		return new int[] {commonMinute, max}; 
 	}
 
 	static class Guard {
 		int id; 
 		List<Integer> sleepytimes; 
 		int amount; 
-		
+
 		Guard(int i) {
 			this.id = i; 
 			this.sleepytimes = new ArrayList<Integer>();
@@ -144,8 +173,11 @@ public class DayFour {
 		int getAmount() {
 			return this.amount;
 		}
+		public String toString() {
+			return id + " " + amount + " " + sleepytimes;
+		}
 	}
-	
+
 	static class Record {
 		int month;
 		int day;
