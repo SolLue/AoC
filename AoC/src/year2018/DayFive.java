@@ -3,6 +3,8 @@ package year2018;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import utility.Property;
 
@@ -16,7 +18,36 @@ public class DayFive {
 		br.close();
 
 		long startTime = System.currentTimeMillis(); 
+		String partOne = reactions(input);
+		long stopTime = System.currentTimeMillis();
 
+		System.out.println("Day Five, Part One: " + partOne.length());
+		System.out.println("Time in ms " + (stopTime - startTime));
+
+		startTime = System.currentTimeMillis(); 
+		String test = input.toUpperCase();
+		List<Character> distinct = test.chars()
+									.distinct()
+									.mapToObj(c -> (char) c)
+									.collect(Collectors.toList());
+
+		int min = Integer.MAX_VALUE;
+		for (Character character : distinct) {
+			String temp = input.replaceAll(String.valueOf(character), "");
+			temp = temp.replaceAll(String.valueOf(Character.toLowerCase(character)), "");
+			
+			String check = reactions(temp);
+			if (check.length() < min)
+				min = check.length();
+		}
+
+		stopTime = System.currentTimeMillis();
+		System.out.println("Day Five, Part Two: " + min);
+		System.out.println("Time in ms " + (stopTime - startTime));
+	}
+
+
+	static String reactions(String input) {
 		boolean reactionsFound = true; 
 		while (reactionsFound) {
 			boolean again = false; 
@@ -42,19 +73,7 @@ public class DayFive {
 			}
 			if (!again)
 				reactionsFound = false; 
-		}
-
-		long stopTime = System.currentTimeMillis();
-		System.out.println("Day Five, Part One: " + input.length());
-		System.out.println("Time in ms " + (stopTime - startTime));
-
-
-
-
-		stopTime = System.currentTimeMillis();
-		System.out.println("Day Five, Part Two: " + 0);
-		System.out.println("Time in ms " + (stopTime - startTime));
+		}	
+		return input;
 	}
-
-
 }

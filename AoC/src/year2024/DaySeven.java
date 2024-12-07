@@ -91,7 +91,7 @@ public class DaySeven {
 		else if (op == Operator.ADD)
 			return nr1 + nr2;
 		else if (op == Operator.CAT) {
-			return Long.parseLong(String.valueOf(nr1) + String.valueOf(nr2));
+			return Long.parseLong(nr1 + "" + nr2);
 		}
 		return 0;
 	}
