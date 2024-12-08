@@ -164,9 +164,6 @@ public class DayEight {
 		public String toString() {
 			return "[" + this.x + " / " + this.y + "]";
 		}
-		int manhatten(Coordinate c) {
-			return (Math.abs(this.x - c.x) + Math.abs(this.y - c.y));
-		}
 		int distanceX(Coordinate c) {
 			return this.x - c.x;
 		}
