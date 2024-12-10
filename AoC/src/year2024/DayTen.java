@@ -43,16 +43,15 @@ public class DayTen {
 		Graph gridgraph = establishGraph(grid);
 		int rating = 0; 
 		int score = 0; 
-		List<Map<Coordinate, Integer>> trails = new ArrayList<Map<Coordinate, Integer>>(); 
 		for (int i = 0; i < grid.length; i++) { 
 			for (int j = 0; j < grid[i].length; j++) { 
 				// get trailhead 
 				if (grid[i][j] == 0) { 
 					Coordinate current = gridgraph.getCoordinate(i, j, grid[i][j]);
 					List<Map<Coordinate, Integer>> tem = getAllPaths(gridgraph, current);
-					
+
 					rating += tem.size();
-					
+
 					Set<Coordinate> end = new HashSet<Coordinate>();
 					for (Map<Coordinate, Integer> map : tem) {
 						for (Coordinate coordinate : map.keySet()) {
@@ -64,7 +63,7 @@ public class DayTen {
 				}
 			}
 		}
-		
+
 		long stopTime = System.currentTimeMillis();
 
 		System.out.println("Day Ten, Part One: " + score);
@@ -73,7 +72,7 @@ public class DayTen {
 		System.out.println("Day Ten, Part Two: " + rating);
 		System.out.println("Time in ms " + (stopTime - startTime));
 	}
-	
+
 	static List<Map<Coordinate, Integer>> getAllPaths(Graph graph, Coordinate source) {
 		List<Map<Coordinate, Integer>> paths = new ArrayList<Map<Coordinate, Integer>>();
 		recursiveGetPaths(graph, source, paths, new LinkedHashMap<Coordinate, Integer>()); 
@@ -102,157 +101,30 @@ public class DayTen {
 
 	static Graph establishGraph(int[][] grid) {
 		Graph gridgraph = new Graph();
+		int[] idir = new int[] {0, -1, 0, 1 };
+		int[] jdir = new int[] {-1, 0, 1, 0 };
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
 				Coordinate current = new Coordinate(i, j, grid[i][j]);
 				gridgraph.addCoordinate(current);
-				// left up
-				if (j == 0 && i == 0) {
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
-					}
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-				} // down right
-				else if (j == grid[i].length - 1 && i == grid.length - 1) {
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-				}
-				// left down
-				else if (j == 0 && i == grid.length - 1) {
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
-					}
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-				}
-				// up right
-				else if (j == grid[i].length - 1 && i == 0) {
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-				}
-				// right
-				else if (j == grid[i].length - 1 && i > 0 && i < grid.length - 1) {
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-				}
-				// left
-				else if (j == 0 && i > 0 && i > 0 && i < grid.length - 1) {
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
-					}
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-				}
-				// up
-				else if (i == 0 && j > 0 && j < grid[i].length - 1) {
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
-					}
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-				}
-				// down
-				else if (i == grid.length - 1 && j > 0 && j < grid[i].length) {
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
-					}
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-				} else {
-					if (grid[i - 1][j] == current.height + 1) {
-						Coordinate up = new Coordinate(i - 1, j, grid[i - 1][j]);
-						gridgraph.addCoordinate(up);
-						gridgraph.addEdge(current, up, grid[i - 1][j]);
-					}
-					if (grid[i + 1][j] == current.height + 1) {
-						Coordinate down = new Coordinate(i + 1, j, grid[i + 1][j]);
-						gridgraph.addCoordinate(down);
-						gridgraph.addEdge(current, down, grid[i + 1][j]);
-					}
-					if (grid[i][j - 1] == current.height + 1) {
-						Coordinate left = new Coordinate(i, j - 1, grid[i][j - 1]);
-						gridgraph.addCoordinate(left);
-						gridgraph.addEdge(current, left, grid[i][j - 1]);
-					}
-					if (grid[i][j + 1] == current.height + 1) {
-						Coordinate right = new Coordinate(i, j + 1, grid[i][j + 1]);
-						gridgraph.addCoordinate(right);
-						gridgraph.addEdge(current, right, grid[i][j + 1]);
+
+				for (int x = 0; x < idir.length; x++) {
+					if (inRange(grid, i + idir[x], j + jdir[x] )) {
+						if (grid[i + idir[x]][j + jdir[x]] == current.height + 1) {
+							Coordinate coord = new Coordinate(i + idir[x], j + jdir[x], 
+									grid[i + idir[x]][j + jdir[x]]);
+							gridgraph.addCoordinate(coord);
+							gridgraph.addEdge(current, coord, grid[i + idir[x]][j + jdir[x]]);
+						}
 					}
 				}
 			}
 		}
 		return gridgraph;
+	}
+
+	static boolean inRange(int[][] grid, int i, int j) {
+		return i >= 0 && i < grid.length && j >= 0 && j < grid[0].length;
 	}
 
 	static class Coordinate implements Comparable<Coordinate> {
