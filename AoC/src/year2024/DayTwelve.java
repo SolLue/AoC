@@ -60,7 +60,7 @@ public class DayTwelve {
 				allRegionsFound = true;
 			}
 		}	
-		
+
 		int fenceCost = 0; 
 		for (Region region : regions) {
 			region.calculateArea();
@@ -228,26 +228,22 @@ public class DayTwelve {
 			}
 
 			int corner = 0; 
-		   
+			if (right + up == 0) 
+				corner++;
+			else if ((right + up == 2) && upright == 0) 
+				corner++;
+			if (right + down == 0) 
+				corner++;
+			else if ((right + down == 2) && downright == 0) 
+				corner++;
 			if (left + up == 0) 
 				corner++;
-		     else if ((left + up == 2) && upleft == 0) 
-		      corner++;
-		    
-		    if (left + down == 0)
-		      corner++;
-		     else if ((left + down == 2) && downleft == 0) 
-		      corner++;
-		    
-		    if (right + up == 0) 
-		      corner++;
-		    else if ((right + up == 2) && upright == 0) 
-		      corner++;
-		    
-		    if (right + down == 0) 
-		      corner++;
-		     else if ((right + down == 2) && downright == 0) 
-		      corner++;
+			else if ((left + up == 2) && upleft == 0) 
+				corner++;
+			if (left + down == 0)
+				corner++;
+			else if ((left + down == 2) && downleft == 0) 
+				corner++;
 
 			return corner;
 		}
