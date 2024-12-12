@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 import utility.Property;
 
@@ -22,17 +21,11 @@ public class DaySeven {
 
 		List<Node> steps = new ArrayList<Node>();
 		String temp = br.readLine();
-		boolean first = true; 
-		Node root = null;
+
 		while(temp != null) {
 			String[] t = temp.split("must be finished before step ");
 			char c1 = t[0].charAt(5);
 			char c2 = t[1].charAt(0);
-			if (first) {
-				root = new Node(c1);
-				steps.add(root);
-				first = false;
-			}
 			boolean found = false;
 			for (int i = 0; i < steps.size(); i++) {
 				if(steps.get(i).chara == c2) {
@@ -45,77 +38,51 @@ public class DaySeven {
 				n.addRequirement(c1);
 				steps.add(n);				
 			}
-
+			found = false; 
+			for (int i = 0; i < steps.size(); i++) {
+				if(steps.get(i).chara == c1) 
+					found = true; 
+			}
+			if(!found)
+				steps.add(new Node(c1));
 			temp = br.readLine();
 		}
 		br.close();
 
 		long startTime = System.currentTimeMillis(); 
 
-		String output = root.chara + "";
-/*
- * I HATE THIS
-		Set<Character> availableSet = new TreeSet<Character>();
-		availableSet.add(root.chara);
-
-		int count = 0; 
-
-		int length = 6;
-		String output = root.chara + "";
-		while(length != output.length()) {
-			System.out.println(availableSet);
-			for (Node node : steps) {
-				Set<Character> req = node.requirement;
-				boolean available = true; 
-				for (Character chara : req) {
-					if (!output.contains(chara + "")) {
-						available = false; 
-					}
-					if (available) {
-						availableSet.add(node.chara);
-					}
-				}
-				for(Character c : availableSet) {
-					if(!output.contains(c + "")) {
-						output += c + "";
-						break;
-					}
-				}
-				count++;
-
-				if (count == 6)
-					break;
-
-
-
+		List<Node> available = new ArrayList<Node>();
+		for (Node n : steps) {
+			if (n.requirement.isEmpty()) {
+				available.add(n);
 			}
-			System.out.println(availableSet);
-			System.out.println(output);
-			break;
-*/
+		}
+		Collections.sort(available, new NodeComparator());
 
-			/*	for (Node node : steps) {
-				Set<Character> req = node.requirement;
-				for (Character chara : req) {
-					if (output.contains(chara + "")) {
-						availableSet.add(chara);
-						System.out.println(availableSet);
-					}
-				}				
-				if(availableSet.contains(node.chara)) {
-					if (!output.contains(node.chara + "")) {
-						output += node.chara;
+		int size = steps.size();	
+		String output = ""; 
+		while(output.length() != size) {
+			Node current = null;
+			if(!available.isEmpty()) {
+				current = available.remove(0);
+				output += current.chara;
+			} 
+			for (Node n : steps) {
+				boolean avail = true; 
+				for (char c : n.requirement) {
+					if(!output.contains(c + "")) {
+						avail = false; 
 					}
 				}
+				if (avail && !available.contains(n) && !output.contains(n.chara + "")) {
+					available.add(n);
+				}
+			}	
+			Collections.sort(available, new NodeComparator());
+		}
 
-			}*/
-	//	}
-
-
-
-		System.out.println();
 		long stopTime = System.currentTimeMillis();
-		System.out.println("Day Seven, Part One: " + output);
+		System.out.println("Day Seven, Part One: " + output); 
 		System.out.println("Time in ms " + (stopTime - startTime));
 		startTime = System.currentTimeMillis(); 
 
@@ -130,7 +97,14 @@ public class DaySeven {
 		System.out.println("Time in ms " + (stopTime - startTime));
 	}
 
-	static class Node implements Comparable<Character> {
+	static class NodeComparator implements Comparator<Node> {
+		@Override
+		public int compare(Node a, Node b) {
+			return Character.valueOf(a.chara).compareTo(Character.valueOf(b.chara));
+		}
+	}
+
+	static class Node {
 		char chara;
 		Set<Character> requirement; 
 
@@ -160,11 +134,6 @@ public class DaySeven {
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.chara, this.requirement);
-		}
-		@Override
-		public int compareTo(Character o) {
-			return Character.valueOf(this.chara).compareTo(Character.valueOf(o));
-
 		}
 	}
 }
