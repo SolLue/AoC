@@ -56,8 +56,6 @@ public class DayThirteen {
 		int costA = 3; 
 		int costB = 1; 
 		long totalCost = 0;
-		long totalCostA = 0;
-		long totalCostB = 0;
 
 		for (ClawMachine clawMachine : claws) {
 
@@ -66,13 +64,10 @@ public class DayThirteen {
 				long buttA = pressing[0];
 				long buttB = pressing[1];
 
-				if(buttA != -1 && buttB != -1) {
-					totalCostA += (costA * buttA);
-					totalCostB += (costB * buttB);
-				}
+				if(buttA != -1 && buttB != -1)
+					totalCost += costA * buttA + costB * buttB;
 			}
 		}
-		totalCost = totalCostA + totalCostB;
 
 		long stopTime = System.currentTimeMillis();
 		System.out.println("Day Thirteen, Part One: " + totalCost);
@@ -81,8 +76,6 @@ public class DayThirteen {
 		startTime = System.currentTimeMillis(); 
 
 		totalCost = 0;
-		totalCostA = 0;
-		totalCostB = 0;
 
 		for (ClawMachine clawMachine : claws) {
 			clawMachine.prizex = clawMachine.prizex + 10000000000000L;
@@ -94,12 +87,9 @@ public class DayThirteen {
 			long buttA = pressing[0];
 			long buttB = pressing[1];
 
-			if(buttA != -1 && buttB != -1) {
-				totalCostA += (costA * buttA);
-				totalCostB += (costB * buttB);
-			}
+			if(buttA != -1 && buttB != -1) 
+				totalCost += costA * buttA + costB * buttB;
 		}
-		totalCost = totalCostA + totalCostB;
 
 		stopTime = System.currentTimeMillis();
 
