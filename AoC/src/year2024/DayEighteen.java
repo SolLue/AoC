@@ -21,9 +21,6 @@ public class DayEighteen {
 		BufferedReader br = new BufferedReader(fr);
 
 		List<String> input = new ArrayList<String>();
-		//char[][] grid = new char[7][7];
-
-		char[][] grid = new char[71][71];
 
 		String temp = br.readLine();
 		while(temp != null) {
@@ -41,28 +38,13 @@ public class DayEighteen {
 			position.add(p);
 		}
 
-		for (int i = 0; i < grid.length; i++) {
-			for (int j = 0; j < grid[i].length; j++) {
-				grid[i][j] = '.';
-			}	
-		}
-
 		Position start = new Position(0, 0);
 		Position end = new Position(70, 70);
 		List<Position> currentObstacles = new ArrayList<Position>();
 		for(int i = 0; i < 1024; i++) {
-			grid[position.get(i).x][position.get(i).y] = '#';
 			currentObstacles.add(position.get(i));
 		}
 
-		/*
-		for (char[] cs : grid) {
-			for (char c : cs) {
-				System.out.print(c);
-			}	
-			System.out.println();
-		}
-		 */
 		Graph graph = new Graph(71, 71, currentObstacles);					
 		Map<Position, Integer> path = djikstra(graph, start, end);		
 
@@ -75,21 +57,17 @@ public class DayEighteen {
 		boolean ok = true;
 		int obs = currentObstacles.size();
 		while (ok) {
-			if(obs < position.size()) {
-				for(int i = obs; i < obs + 1; i++) {
-					grid[position.get(i).x][position.get(i).y] = '#';
-					currentObstacles.add(position.get(i));
-				}
-				graph = new Graph(71, 71, currentObstacles);	
-				path = djikstra(graph, start, end);
-				if (path.get(end) == null)
-					ok = false;
-				else
-					obs++;
-			} else
-				break;
+			for(int i = obs; i < obs + 1; i++) {
+				currentObstacles.add(position.get(i));
+			}
+			graph = new Graph(71, 71, currentObstacles);	
+			path = djikstra(graph, start, end);
+			if (path.get(end) == null)
+				ok = false;
+			else
+				obs++;
 		}
-		
+
 		stopTime = System.currentTimeMillis();
 		System.out.println("Day Eighteen, Part Two: " + " index " + obs 
 				+ " coord (flip back): " + currentObstacles.get(obs));
@@ -113,7 +91,7 @@ public class DayEighteen {
 			}
 
 			for(Position next : g.getNeighbours(current)) {
-				int newcost = costSoFar.get(current) + 1;//g.getNeighbours(current).get(next);
+				int newcost = costSoFar.get(current) + 1;
 				if(!costSoFar.containsKey(next) || newcost < costSoFar.get(next)) {
 					costSoFar.put(next, newcost);
 					queue.add(next);
@@ -123,7 +101,6 @@ public class DayEighteen {
 		}
 		return costSoFar;	
 	}
-
 
 	static class Position implements Comparable<Position> {
 		int x;

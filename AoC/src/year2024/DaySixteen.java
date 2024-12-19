@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
+import utility.Coordinate;
 import utility.Property;
 
 
@@ -35,36 +37,26 @@ public class DaySixteen {
 			grid[i] = input.get(i).toCharArray();
 		}
 
-		Graph graph = establishGraph(grid);
-
-		//private Map<Node, Map<Node, Integer>> edges;
-
-		/*	for(Node e : graph.getEdges().keySet()) {
-			System.out.println(e + " " + graph.getEdges(e));
-		}*/
+	//	Graph graph = establishGraph(grid);
 
 		Node start = null;
 		Node end = null;
 		for(int i = 0; i < grid.length; i++) {
 			for(int j = 0; j < grid[i].length; j++) {
 				if (grid[i][j] == 'E') {
-					end = graph.getNode(i, j);
+			//		end = graph.getNode(i, j);
 				}
 				if (grid[i][j] == 'S') {
-					start = graph.getNode(i, j);					
+			//		start = graph.getNode(i, j);					
 				}
 			}
 		}
-		System.out.println("start "+ start + " " + graph.edges.get(start));
-		System.out.println("end "+ end + " " + graph.edges.get(end));
 
-		
-		
-		Map<Node, Integer> dij = djikstra(graph, start, end);
-		int cost = 0;//dij.get(end);
+	//	Map<Node, Integer> dij = djikstra(graph, start, end);
+	//	int cost = dij.get(end);
 		long stopTime = System.currentTimeMillis();
 
-		System.out.println("Day Sixteen, Part One: " + cost);
+	//	System.out.println("Day Sixteen, Part One: " + cost);
 		System.out.println("Time in ms " + (stopTime - startTime));
 
 		startTime = System.currentTimeMillis(); 
@@ -75,7 +67,7 @@ public class DaySixteen {
 		
 		
 		
-		System.out.println(dij);
+	//	System.out.println(dij);
 		
 		
 		//	graph = establishGraph(grid);
@@ -103,7 +95,7 @@ public class DaySixteen {
 		return i >= 0 && i < grid.length && j >= 0 && j < grid[0].length;
 	}
 
-	static Graph establishGraph(char[][] grid) {
+	/*static Graph establishGraph(char[][] grid) {
 		Graph gridgraph = new Graph();
 		int[] idir = new int[] {0, -1, 0, 1 };
 		int[] jdir = new int[] {-1, 0, 1, 0 };
@@ -136,7 +128,7 @@ public class DaySixteen {
 			}
 		}
 		return gridgraph;
-	}
+	}*/
 
 
 	static Map<Node, Integer> djikstra(Graph g, Node start, Node destination) {
@@ -148,11 +140,11 @@ public class DaySixteen {
 
 		costSoFar.put(start, 0);
 
-		while (!queue.isEmpty()) {
-			Node current = queue.poll();
-			Map<Node, Integer> neighbour = g.getEdges(current);
+	//	while (!queue.isEmpty()) {
+	//		Node current = queue.poll();
+	//		Map<Node, Integer> neighbour = g.getEdges(current);
 
-			for(Node next : neighbour.keySet()) {
+		/*	for(Node next : neighbour.keySet()) {
 
 				int nextCost = 1; 
 				if (current.direction == 'E') {
@@ -189,7 +181,7 @@ public class DaySixteen {
 
 			}
 		}
-
+*/
 		return costSoFar;
 	}
 
@@ -258,90 +250,7 @@ public class DaySixteen {
 		return costSoFar;	
 	}*/
 
-	/*
-
-	static List<Map<Node, Integer>> getAllPathsDestination(Graph graph, Node source,
-			Node destination, int target) {
-		List<Map<Node, Integer>> paths = new ArrayList<Map<Node, Integer>>();
-		recursiveGetPathsDestination(graph, source, paths, 
-				new LinkedHashMap<Node, Integer>(), destination, 0, target); 
-		return paths;
-	}
-
-	static void recursiveGetPathsDestination(Graph graph, Node current, List<Map<Node, 
-			Integer>> paths, LinkedHashMap<Node, Integer> path, Node destination, 
-			int currentcost, int target) {
-
-		int abortEarly = 0; 
-		for (Node node : path.keySet()) {
-			abortEarly += path.get(node);
-		}	
-		path.put(current, currentcost);		
-		if(current.equals(destination)) {
-			if (abortEarly <= target) {
-				paths.add(new HashMap<Node, Integer>(path));
-			}
-			path.remove(current);				
-			return; 
-		}
-
-		if(abortEarly <= target) {
-			Map<Node, Integer> edges = graph.getEdges(current);
-
-			for (Node e : edges.keySet()) {
-				if (!path.containsKey(e)) {
-
-					if(current.x == e.x && current.y == e.y - 1) {
-						e.direction = 'E';
-					} else if(current.x == e.x && current.y == e.y + 1) {
-						e.direction = 'W';
-					} else if(current.x == e.x - 1 && current.y == e.y) {
-						e.direction = 'S';
-					} else if(current.x == e.x + 1 && current.y == e.y) {
-						e.direction = 'N';
-					}
-
-					if (current.direction == 'E') {
-						if (e.direction == 'N') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'S') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'E') {
-							currentcost = edges.get(e);
-						}
-					} else if (current.direction == 'N') {
-						if (e.direction == 'E') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'W') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'N') {
-							currentcost = edges.get(e);
-						}
-					} else if (current.direction == 'W') {
-						if (e.direction == 'N') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'S') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'W') {
-							currentcost = edges.get(e);
-						}
-					} else if (current.direction == 'S') {
-						if (e.direction == 'E') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'W') {
-							currentcost = edges.get(e) + 1000;
-						} else if (e.direction == 'S') {
-							currentcost = edges.get(e);
-						}
-					}
-					recursiveGetPathsDestination(graph, e, paths, path, destination, currentcost, target);
-				}
-			}
-		} 
-		path.remove(current);
-	}
-	 */
-
+	
 	static class Node implements Comparable<Node> {
 		int x;
 		int y;
@@ -393,7 +302,7 @@ public class DaySixteen {
 		}
 	}
 
-	static class Graph {
+	/*static class Graph {
 		private Map<Node, Map<Node, Integer>> edges;
 
 		Graph() {
@@ -439,6 +348,58 @@ public class DaySixteen {
 				return true;
 			}
 			return false;
+		}
+	}
+	*/
+	static class Graph {
+		int[][] grid; 
+		List<Node> obstacle; 
+			
+		Graph(int h, int w, List<Node> o) {
+			this.grid = new int [h][];
+			for(int i = 0; i < h; i++) {
+				this.grid[i] = new int[w];
+			}
+			this.obstacle = o;
+		}
+		
+		Graph(int h, int w) {
+			this.grid = new int [h][];
+			for(int i = 0; i < h; i++) {
+				this.grid[i] = new int[w];
+			}
+			this.obstacle = new ArrayList<Node>();
+		}
+		List<Node> getObstacles() {
+			return this.obstacle;
+		}
+		boolean inBounds(int x, int y) {
+			return (0 <= x && x < this.grid[0].length) && (0 <= y && y < this.grid.length);
+		}
+		boolean inBounds(Node c) {
+			return (c.x >= 0 && c.x < this.grid[0].length) 
+					&& (c.y >= 0 && c.y < this.grid.length);
+		}
+		boolean passable(int x, int y) {
+			Node c = new Node(x, y);
+			return obstacle.contains(c);
+		}
+		boolean passable(Node c) {
+			return !obstacle.contains(c);
+		}
+		
+		// change the order of coordinates added here for different movement -> ugly paths 
+		List<Node> getNeighbours(Node c) {
+			List<Node> temp = new ArrayList<Node>(); 
+			temp.add(new Node(c.x, c.y - 1)); //N
+			temp.add(new Node(c.x + 1, c.y)); //E
+			temp.add(new Node(c.x - 1, c.y)); //W
+			temp.add(new Node(c.x, c.y + 1)); //S
+			
+			temp = temp.stream().filter(e -> inBounds(e)).collect(Collectors.toList());
+			temp = temp.stream().filter(e -> passable(e)).collect(Collectors.toList());
+
+			return temp;
 		}
 	}
 }
