@@ -36,8 +36,78 @@ public class DayTwentyFour {
 
 		long startTime = System.currentTimeMillis(); 
 
-		List<Command> operationsCopy = new ArrayList<Command>(operations);
+		long output = getFirstPart(operations, input);
 
+		long stopTime = System.currentTimeMillis();
+		System.out.println("Day TwentyFour, Part One: " + output);
+		System.out.println("Time in ms " + (stopTime - startTime));
+
+		startTime = System.currentTimeMillis(); 
+
+		List<Command> breakers = new ArrayList<Command>();		
+		for (int i = 0; i < operations.size(); i++) {
+			if (operations.get(i).saveto.startsWith("z")) {
+				if (!operations.get(i).command.equals("XOR") && !operations.get(i).saveto.equals("z45")) {
+					breakers.add(operations.get(i));
+				} 
+			}
+			if (operations.get(i).command.equals("XOR")) { 
+				if(!operations.get(i).saveto.startsWith("z")) {
+					if (!(operations.get(i).first.startsWith("x") && operations.get(i).second.startsWith("y")) 
+							&& !(operations.get(i).second.startsWith("x") && operations.get(i).first.startsWith("y"))) {
+						breakers.add(operations.get(i));
+					} else {
+						String lookahead = operations.get(i).saveto;
+						boolean flag = false;
+						for (Command command : operations) {
+							if (command.command.equals("XOR")) {
+								if(command.first.equals(lookahead) || command.second.equals(lookahead)) {
+									flag = true;
+								}
+							}
+						}
+						if (!flag)
+							breakers.add(operations.get(i));
+					}
+				} 
+			}
+			if (!breakers.contains(operations.get(i))) {
+				if (!(operations.get(i).first.equals("y00") && operations.get(i).second.equals("x00")) 
+						&& !(operations.get(i).second.equals("y00") && operations.get(i).first.equals("x00"))) {
+					if (operations.get(i).command.equals("AND")) {
+						String lookahead = operations.get(i).saveto;
+						boolean flag = false;
+						for (Command command : operations) {
+							if (command.command.equals("OR")) {
+								if(command.first.equals(lookahead) || command.second.equals(lookahead)) {
+									flag = true;
+								}
+							}
+						}
+						if (!flag)
+							breakers.add(operations.get(i));
+					}
+				}
+			}
+		}
+		
+		List<String> sorted = new ArrayList<String>();
+		for (Command command : breakers) {
+			sorted.add(command.saveto);
+		}
+		Collections.sort(sorted);
+		String out = ""; 
+		for (String s : sorted) {
+			out += s +","; 
+		}
+		
+		stopTime = System.currentTimeMillis();
+		System.out.println("Day TwentyFour, Part Two: " + out.substring(0, out.length() - 1));
+		System.out.println("Time in ms " + (stopTime - startTime));
+	}
+
+	static long getFirstPart(List<Command> operations, Map<String, Integer> input) {
+		List<Command> operationsCopy = new ArrayList<Command>(operations);
 		while (!operationsCopy.isEmpty()) {
 			Command current = null;
 			for (int i = 0; i < operationsCopy.size(); i++) {
@@ -47,10 +117,8 @@ public class DayTwentyFour {
 					break;
 				}
 			}
-			if (current != null) 
-				operationsCopy.remove(current);
+			operationsCopy.remove(current);
 		}
-
 
 		List<String> sorted = new ArrayList<String>();
 		sorted.addAll(input.keySet().stream().filter(key -> key.startsWith("z"))
@@ -61,22 +129,9 @@ public class DayTwentyFour {
 		for (String string : sorted) {
 			out += input.get(string) + ""; 
 		}
-
+		System.out.println(out);
 		long output = Long.parseLong(out, 2);
-
-
-
-		long stopTime = System.currentTimeMillis();
-		System.out.println("Day TwentyFour, Part One: " + output);
-		System.out.println("Time in ms " + (stopTime - startTime));
-
-		startTime = System.currentTimeMillis(); 
-
-
-
-		stopTime = System.currentTimeMillis();
-		System.out.println("Day TwentyFour, Part Two: " + 0);
-		System.out.println("Time in ms " + (stopTime - startTime));
+		return output;
 	}
 
 	static class Command {
