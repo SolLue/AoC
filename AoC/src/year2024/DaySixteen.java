@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
-import utility.Coordinate;
 import utility.Property;
-
 
 public class DaySixteen {
 	public static void main(String[] args) throws IOException {
@@ -31,374 +29,280 @@ public class DaySixteen {
 
 		long startTime = System.currentTimeMillis(); 
 
-
 		char[][] grid = new char[input.size()][];
 		for(int i = 0; i < input.size(); i++) {
 			grid[i] = input.get(i).toCharArray();
 		}
 
-	//	Graph graph = establishGraph(grid);
-
-		Node start = null;
-		Node end = null;
+		Coordinate start = null;
+		Coordinate end = null;
+		List<Coordinate> obstacles = new ArrayList<Coordinate>();
 		for(int i = 0; i < grid.length; i++) {
-			for(int j = 0; j < grid[i].length; j++) {
-				if (grid[i][j] == 'E') {
-			//		end = graph.getNode(i, j);
+			for(int j = 0; j < grid[0].length; j++) {
+				if (grid[i][j] == '#') {
+					Coordinate c = new Coordinate(i, j, Direction.NONE, Integer.MAX_VALUE);
+					obstacles.add(c);
 				}
-				if (grid[i][j] == 'S') {
-			//		start = graph.getNode(i, j);					
-				}
+				if (grid[i][j] == 'E') 
+					end = new Coordinate(i, j);
+				if (grid[i][j] == 'S') 
+					start = new Coordinate(i, j, Direction.EAST, 0);	
 			}
 		}
 
-	//	Map<Node, Integer> dij = djikstra(graph, start, end);
-	//	int cost = dij.get(end);
+		Graph graph = new Graph(grid.length, grid[0].length, obstacles);
+
+		int minimum = Integer.MAX_VALUE;
+
+		Map<Coordinate, Integer> shortest = djikstra(graph, 0, start, end, minimum);
+
+		List<Coordinate> ends = new ArrayList<Coordinate>();
+		for (Coordinate coordinate : shortest.keySet()) {
+			if (coordinate.x == end.x && coordinate.y == end.y) {
+				ends.add(coordinate);
+			}
+		}
+
+		Coordinate e = end;
+		for (Coordinate coordinate : ends) {
+			if(shortest.get(coordinate) < minimum) {
+				minimum = shortest.get(coordinate);
+				e = coordinate;
+			}
+		}
+
+		Map<Coordinate, Integer> path = new HashMap<Coordinate, Integer>();
+		Coordinate current = e; 
+		path.put(current, shortest.get(current));
+		while (current.prev != null) {
+			current = current.prev;
+			path.put(current, shortest.get(current));
+		}	
+
 		long stopTime = System.currentTimeMillis();
 
-	//	System.out.println("Day Sixteen, Part One: " + cost);
+		System.out.println("Day Sixteen, Part One: " + minimum);
 		System.out.println("Time in ms " + (stopTime - startTime));
 
-		startTime = System.currentTimeMillis(); 
+		startTime = System.currentTimeMillis(); 	
 
+		int count = 0;
 
-		
-		
-		
-		
-		
-	//	System.out.println(dij);
-		
-		
-		//	graph = establishGraph(grid);
-		//	List<Map<Node, Integer>> paths = getAllPathsDestination(graph, start, end, cost);
+		Map<Coordinate, Integer> neighbours = new HashMap<Coordinate, Integer>();
+		for (Coordinate i : path.keySet()) {
+			Coordinate neigh = graph.getNeighbours(i);
+			List<Coordinate> rotation = graph.getRotation(i); 
 
-		/*	System.out.println(paths.size());
-		for (Map<Node, Integer> map : paths) {
-			int sigh = 0;
-			System.out.println(map);
-			for (Node node : map.keySet()) {
-				sigh += map.get(node);
+			if (neigh != null && !path.containsKey(neigh)) {
+				int cost = path.get(i) + 1;
+				if(cost < minimum)
+					neighbours.put(neigh, cost);
 			}
-		System.out.println(sigh);
+			for (Coordinate rotate : rotation) {				
+				if (!path.containsKey(rotate)) {
+					int cost = path.get(i) + 1000;
+					if(cost < minimum)
+						neighbours.put(rotate, cost);
+				} 
+			}
 		}
-		 */
 
+		for (Coordinate coord : neighbours.keySet()) {
+			shortest = djikstra(graph, neighbours.get(coord), coord, end, minimum); 
 
+			ends = new ArrayList<Coordinate>();
+			for (Coordinate coordinate : shortest.keySet()) {
+				if (coordinate.x == end.x && coordinate.y == end.y)
+					ends.add(coordinate);
+			}
+			e = null;
+			for (Coordinate coordinate : ends) {
+				if(shortest.get(coordinate) == minimum)
+					e = coordinate;
+			}
+			if (shortest.get(e) != null) {
+				current = e; 
+				path.put(current, shortest.get(current));
+
+				while (current.prev != null) {
+					current = current.prev;
+					path.put(current, shortest.get(current));
+				}	
+			}
+		}
+
+		for (Coordinate i : path.keySet()) {
+			grid[i.x][i.y] = 'ö';				
+		}
+		for(int i = 0; i < grid.length; i++) {
+			for(int j = 0; j < grid[0].length; j++) {
+				if (grid[i][j] == 'ö')
+					count++;
+			}
+		}
 
 		stopTime = System.currentTimeMillis();
-		System.out.println("Day Sixteen, Part Two: " + 0);
+		System.out.println("Day Sixteen, Part Two: " + count);
 		System.out.println("Time in ms " + (stopTime - startTime));
 	}
 
-	static boolean inRange(char[][] grid, int i, int j) {
-		return i >= 0 && i < grid.length && j >= 0 && j < grid[0].length;
-	}
-
-	/*static Graph establishGraph(char[][] grid) {
-		Graph gridgraph = new Graph();
-		int[] idir = new int[] {0, -1, 0, 1 };
-		int[] jdir = new int[] {-1, 0, 1, 0 };
-		for (int i = 0; i < grid.length; i++) {
-			for (int j = 0; j < grid[i].length; j++) {
-				if(grid[i][j] != '#') {
-					Node current = new Node(i, j);
-					gridgraph.addNode(current);
-
-					for (int x = 0; x < idir.length; x++) {
-						if (inRange(grid, i + idir[x], j + jdir[x])) {
-							if (grid[i + idir[x]][j + jdir[x]] != '#') {
-								Node coord = new Node(i + idir[x], j + jdir[x]);
-								gridgraph.addNode(coord);
-
-								if(current.x == coord.x && current.y == coord.y - 1) {
-									coord.direction = 'E';
-								}else if(current.x == coord.x && current.y == coord.y + 1) {
-									coord.direction = 'W';
-								} else if(current.x == coord.x - 1 && current.y == coord.y) {
-									coord.direction = 'S';
-								} else if(current.x == coord.x + 1 && current.y == coord.y) {
-									coord.direction = 'N';
-								}
-								gridgraph.addEdge(current, coord, 1);
-							}
-						}
-					}
-				}
-			}
-		}
-		return gridgraph;
-	}*/
-
-
-	static Map<Node, Integer> djikstra(Graph g, Node start, Node destination) {
-		Queue<Node> queue = new PriorityQueue<Node>();
+	static Map<Coordinate, Integer> djikstra(Graph graph, int startCost, Coordinate start, 
+			Coordinate destination, int minimum) {
+		Queue<Coordinate> queue = new PriorityQueue<Coordinate>();
 		queue.add(start);
-
-
-		Map<Node, Integer> costSoFar = new HashMap<Node, Integer>();
-
-		costSoFar.put(start, 0);
-
-	//	while (!queue.isEmpty()) {
-	//		Node current = queue.poll();
-	//		Map<Node, Integer> neighbour = g.getEdges(current);
-
-		/*	for(Node next : neighbour.keySet()) {
-
-				int nextCost = 1; 
-				if (current.direction == 'E') {
-					if (next.direction == 'N') {
-						nextCost = 1001;
-					} else if (next.direction == 'S') {
-						nextCost = 1001;
-					}
-				} else if (current.direction == 'N') {
-					if (next.direction == 'E') {
-						nextCost = 1001;
-					} else if (next.direction == 'W') {
-						nextCost = 1001;
-					} 
-				} else if (current.direction == 'W') {
-					if (next.direction == 'N') {
-						nextCost = 1001;
-					} else if (next.direction == 'S') {
-						nextCost = 1001;
-					}
-				} else if (current.direction == 'S') {
-					if (next.direction == 'E') {
-						nextCost = 1001;
-					} else if (next.direction == 'W') {
-						nextCost = 1001;
-					}
-				}
-
-				int newcost = costSoFar.get(current) + nextCost;
-				if(!costSoFar.containsKey(next)) {
-					costSoFar.put(next, newcost);
-					queue.add(next);
-				}
-
-			}
-		}
-*/
-		return costSoFar;
-	}
-
-
-	/*static Map<Node, Integer> djikstra(Graph g, Node start, Node destination) {
-		Queue<Node> queue = new PriorityQueue<Node>();
-		queue.add(start);
-
-		List<Node> visited = new ArrayList<Node>(); 
-		visited.add(start);
-		Map<Node, Integer> costSoFar = new HashMap<Node, Integer>();
-		costSoFar.put(start, 0);
+		Map<Coordinate, Integer> pathWithCost = new HashMap<Coordinate, Integer>();
+		pathWithCost.put(start, startCost);
+		start.prev = null;
 
 		while(!queue.isEmpty()) {
-			Node current = queue.poll();
+			Coordinate current = queue.poll(); 
+			if(current.cost < minimum) {
+				if(current.x == destination.x && current.y == destination.y)
+					return pathWithCost;
 
-			if(start.equals(destination))
-				return costSoFar; 
+				Coordinate neighbours = graph.getNeighbours(current);
+				List<Coordinate> rotation = graph.getRotation(current);
 
-			for(Node next : g.getEdges(current).keySet()) {
-
-				if(current.x == next.x && current.y == next.y - 1) {
-					next.direction = 'E';
-				}else if(current.x == next.x && current.y == next.y + 1) {
-					next.direction = 'W';
-				} else if(current.x == next.x - 1 && current.y == next.y) {
-					next.direction = 'S';
-				} else if(current.x == next.x + 1 && current.y == next.y) {
-					next.direction = 'N';
-				}
-
-				int nextCost = 1; 
-				if (current.direction == 'E') {
-					if (next.direction == 'N') {
-						nextCost = 1001;
-					} else if (next.direction == 'S') {
-						nextCost = 1001;
-					}
-				} else if (current.direction == 'N') {
-					if (next.direction == 'E') {
-						nextCost = 1001;
-					} else if (next.direction == 'W') {
-						nextCost = 1001;
-					} 
-				} else if (current.direction == 'W') {
-					if (next.direction == 'N') {
-						nextCost = 1001;
-					} else if (next.direction == 'S') {
-						nextCost = 1001;
-					}
-				} else if (current.direction == 'S') {
-					if (next.direction == 'E') {
-						nextCost = 1001;
-					} else if (next.direction == 'W') {
-						nextCost = 1001;
+				if (neighbours != null) {
+					int neighdistance = pathWithCost.get(current) + 1;
+					if(!pathWithCost.containsKey(neighbours) || neighdistance < pathWithCost.get(neighbours)) {
+						pathWithCost.put(neighbours, neighdistance);
+						neighbours.cost = neighdistance;
+						queue.add(neighbours);
+						neighbours.prev = current;
 					}
 				}
-				int newcost = costSoFar.get(current) + nextCost;
-				if(!costSoFar.containsKey(next) || newcost < costSoFar.get(next)) {
-					costSoFar.put(next, newcost);
-					queue.add(next);
-					visited.add(next);
+				for(Coordinate next : rotation) {
+					int newcost = pathWithCost.get(current) + 1000;
+					if(!pathWithCost.containsKey(next) || newcost < pathWithCost.get(next)) {
+						pathWithCost.put(next, newcost);
+						queue.add(next);
+						next.cost = newcost;
+						next.prev = current;
+					}
 				}
-			}
+			} 
 		}
-		return costSoFar;	
-	}*/
+		return pathWithCost;	
+	}
 
-	
-	static class Node implements Comparable<Node> {
+	static class Coordinate implements Comparable<Coordinate> {
 		int x;
 		int y;
-		char direction;
-		//		int cost; 
+		Direction direction = Direction.NONE; 
+		Coordinate prev = null; 
+		int cost; 
 
-		/*	Node(int i, int j, int c) {
+		Coordinate(int i, int j) {
 			this.x = i;
 			this.y = j;
-			this.cost = c; 
 		}
-		 */
-		Node(int i, int j) {
+		Coordinate(int i, int j, Direction d) {
 			this.x = i;
 			this.y = j;
-			//		this.cost = 1; 
-			this.direction = 'E';
+			this.direction = d; 
+		}
+		Coordinate(int i, int j, Direction d, int c) {
+			this.x = i;
+			this.y = j;
+			this.direction = d;
 		}
 
-		//	void setCost(int c) {
-		//		this.cost = c; 
-		//	}
-
-		//	public int getCost() {
-		//		return this.cost; 
-		//	}
+		int getX() {
+			return this.x;
+		}
+		int getY() {
+			return this.y;
+		}
 
 		public String toString() {
-			return this.x + "/" + this.y ;//+ " " + this.cost + " facing " + this.direction;
+			return "[" + this.x + " / " + this.y + "] " + this.direction;
 		}
-
-		@Override
-		public int compareTo(Node o) {
-			return Integer.compare(1, 1);
-		}
-
 		@Override
 		public int hashCode() {
-			return Integer.valueOf(this.x).hashCode() + Integer.valueOf(this.y).hashCode();
+			return Objects.hash(direction, x, y);
 		}
-
 		@Override
-		public boolean equals(Object o) {
-			Node c = (Node) o;
-			if(this.x == c.x && this.y == c.y) {
-				return true; 
-			}
-			return false;
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Coordinate other = (Coordinate) obj;
+			return direction == other.direction && x == other.x && y == other.y;
+		}
+		@Override
+		public int compareTo(Coordinate o) {
+			return this.cost - o.cost;
 		}
 	}
 
-	/*static class Graph {
-		private Map<Node, Map<Node, Integer>> edges;
-
-		Graph() {
-			this.edges = new HashMap<Node, Map<Node, Integer>>();
-		}
-
-		Map<Node, Integer> getEdges(Node current) {
-			if (this.edges.containsKey(current))
-				return this.edges.get(current);
-			return null;
-		}
-
-		Map<Node, Map<Node, Integer>> getEdges() {
-			return this.edges;
-		}
-
-		Node getNode(int x, int y) {
-			Node n = new Node(x, y);
-			if (edges.containsKey(n))
-				return n;
-			return null;
-		}
-
-		Node getNode(Node n) {
-			if (this.edges.containsKey(n))
-				return n;
-			return null;
-		}
-
-		boolean addEdge(Node current, Node edge, int weight) {
-			if (this.edges.containsKey(current) && edges.containsKey(edge)) {
-				Map<Node, Integer> temp = this.edges.get(current);
-				temp.put(edge, weight);
-				this.edges.put(current, temp);
-				return true;
-			}
-			return false;
-		}
-
-		boolean addNode(Node t) {
-			if (!edges.containsKey(t)) {
-				this.edges.put(t, new HashMap<>());
-				return true;
-			}
-			return false;
-		}
+	static enum Direction { 
+		EAST, WEST, SOUTH, NORTH, NONE
 	}
-	*/
+
 	static class Graph {
+		List<Coordinate> obstacle; 
 		int[][] grid; 
-		List<Node> obstacle; 
-			
-		Graph(int h, int w, List<Node> o) {
-			this.grid = new int [h][];
-			for(int i = 0; i < h; i++) {
-				this.grid[i] = new int[w];
-			}
-			this.obstacle = o;
-		}
-		
-		Graph(int h, int w) {
-			this.grid = new int [h][];
-			for(int i = 0; i < h; i++) {
-				this.grid[i] = new int[w];
-			}
-			this.obstacle = new ArrayList<Node>();
-		}
-		List<Node> getObstacles() {
-			return this.obstacle;
-		}
-		boolean inBounds(int x, int y) {
-			return (0 <= x && x < this.grid[0].length) && (0 <= y && y < this.grid.length);
-		}
-		boolean inBounds(Node c) {
-			return (c.x >= 0 && c.x < this.grid[0].length) 
-					&& (c.y >= 0 && c.y < this.grid.length);
-		}
-		boolean passable(int x, int y) {
-			Node c = new Node(x, y);
-			return obstacle.contains(c);
-		}
-		boolean passable(Node c) {
-			return !obstacle.contains(c);
-		}
-		
-		// change the order of coordinates added here for different movement -> ugly paths 
-		List<Node> getNeighbours(Node c) {
-			List<Node> temp = new ArrayList<Node>(); 
-			temp.add(new Node(c.x, c.y - 1)); //N
-			temp.add(new Node(c.x + 1, c.y)); //E
-			temp.add(new Node(c.x - 1, c.y)); //W
-			temp.add(new Node(c.x, c.y + 1)); //S
-			
-			temp = temp.stream().filter(e -> inBounds(e)).collect(Collectors.toList());
-			temp = temp.stream().filter(e -> passable(e)).collect(Collectors.toList());
 
+		Graph(int h, int w, List<Coordinate> obstacles) {
+			this.grid = new int[h][w];	
+			this.obstacle = obstacles;
+		}
+
+		boolean inBounds(Coordinate c) {
+			return (c.getX() >= 0 && c.getX() < this.grid.length) 
+					&& (c.getY() >= 0 && c.getY() < this.grid[0].length);
+		}
+
+		boolean passable(Coordinate c) {
+			Coordinate co = new Coordinate(c.x, c.y, Direction.NONE, Integer.MAX_VALUE);
+			return !this.obstacle.contains(co);
+		}
+
+		List<Coordinate> getRotation(Coordinate c) {
+			List<Coordinate> rotate = new ArrayList<Coordinate>();
+
+			if(c.direction.equals(Direction.NORTH) || c.direction.equals(Direction.SOUTH)) {
+				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
+				if(inBounds(e) && passable(e))
+					rotate.add(new Coordinate(c.x, c.y, Direction.EAST));
+				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
+				if(inBounds(w) && passable(w))
+					rotate.add(new Coordinate(c.x, c.y, Direction.WEST));
+			} else if(c.direction.equals(Direction.EAST) || c.direction.equals(Direction.WEST)) {
+				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
+				if(inBounds(n) && passable(n))
+					rotate.add(new Coordinate(c.x, c.y, Direction.NORTH));
+				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
+				if(inBounds(s) && passable(s))
+					rotate.add(new Coordinate(c.x, c.y, Direction.SOUTH));
+			}
+			return rotate;
+		}
+
+		Coordinate getNeighbours(Coordinate c) {
+			Coordinate temp = null; 
+
+			if(c.direction.equals(Direction.NORTH)) {
+				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
+				if(inBounds(n) && passable(n)) 
+					temp = n; 		
+			} else if(c.direction.equals(Direction.EAST)) {
+				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
+				if(inBounds(e) && passable(e))
+					temp = e; 		
+			} else if(c.direction.equals(Direction.SOUTH)) {
+				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
+				if(inBounds(s) && passable(s)) 
+					temp = s; 		
+			} else if(c.direction.equals(Direction.WEST)) {
+				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
+				if(inBounds(w) && passable(w)) 
+					temp = w; 			
+			}
 			return temp;
 		}
 	}
