@@ -146,8 +146,7 @@ public class DaySixteen {
 		System.out.println("Time in ms " + (stopTime - startTime));
 	}
 
-	static Map<Coordinate, Integer> djikstra(Graph graph, int startCost, Coordinate start, 
-			Coordinate destination, int minimum) {
+	static Map<Coordinate, Integer> djikstra(Graph graph, int startCost, Coordinate start, Coordinate destination, int minimum) {
 		Queue<Coordinate> queue = new PriorityQueue<Coordinate>();
 		queue.add(start);
 		Map<Coordinate, Integer> pathWithCost = new HashMap<Coordinate, Integer>();
