@@ -1,19 +1,21 @@
-package year2024;
+package utility.PathFinding;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 import utility.Property;
 
-public class DaySixteen {
+public class Day16TestDjikstraPrevsList {
 	public static void main(String[] args) throws IOException {
 		String folder = Property.getFilePathHome();
 		FileReader fr = new FileReader(folder + "/year2024/input/day16.txt");
@@ -51,144 +53,98 @@ public class DaySixteen {
 		}
 
 		Graph graph = new Graph(grid.length, grid[0].length, obstacles);
-		int minimum = Integer.MAX_VALUE;
-		Map<Coordinate, Integer> shortest = djikstra(graph, 0, start, end, minimum);
+		Map<Coordinate, Integer> pathCost = djikstra(graph, start, end);
 
-		List<Coordinate> ends = new ArrayList<Coordinate>();
-		for (Coordinate coordinate : shortest.keySet()) {
-			if (coordinate.x == end.x && coordinate.y == end.y) {
-				ends.add(coordinate);
-			}
-		}
-
-		Coordinate e = end;
-		for (Coordinate coordinate : ends) {
-			if(shortest.get(coordinate) < minimum) {
-				minimum = shortest.get(coordinate);
-				e = coordinate;
-			}
-		}
-
-		Map<Coordinate, Integer> path = new HashMap<Coordinate, Integer>();
-		Coordinate current = e; 
-		path.put(current, shortest.get(current));
-		while (current.prev != null) {
-			current = current.prev;
-			path.put(current, shortest.get(current));
-		}	
-
+		int minimum = pathCost.get(destination);
+		
 		long stopTime = System.currentTimeMillis();
 
 		System.out.println("Day Sixteen, Part One: " + minimum);
 		System.out.println("Time in ms " + (stopTime - startTime));
 
-
 		startTime = System.currentTimeMillis(); 	
 
-		int count = 0;
+		Set<Coordinate> path = new HashSet<Coordinate>();
+		Queue<Coordinate> q = new PriorityQueue<Coordinate>();
+		Set<Coordinate> visited = new HashSet<Coordinate>();
 
-		Map<Coordinate, Integer> neighbours = new HashMap<Coordinate, Integer>();
-		for (Coordinate i : path.keySet()) {
-
-			Coordinate neigh = graph.getNeighbours(i);
-			List<Coordinate> rotation = graph.getRotation(i, path); 
-			if (neigh != null && !path.containsKey(neigh)) {
-				int cost = path.get(i) + 1;
-				if(cost < minimum)
-					neighbours.put(neigh, cost);
+		q.add(destination);
+		while(!q.isEmpty()) {
+			Coordinate current = q.poll();
+			visited.add(current);
+			path.add(current);
+			
+			if(!current.prevs.isEmpty()) {
+				System.out.println(current.prevs);
+				for (Coordinate coordinate : current.prevs) {
+					if (!visited.contains(coordinate)) {
+						if(pathCost.get(coordinate) < minimum)
+							q.add(coordinate);
+					}
+				}
 			}
-			for (Coordinate rotate : rotation) {
-				if (!path.containsKey(rotate)) {
-					int cost = path.get(i) + 1000;
-					if(cost < minimum) 
-						neighbours.put(rotate, cost);
-				} 
-			}
+			current = current.prev;
 		}
-
-		for (Coordinate coord : neighbours.keySet()) {
-			if(!path.containsKey(coord)) {
-				shortest = djikstra(graph, neighbours.get(coord), coord, end, minimum); 
-				ends = new ArrayList<Coordinate>();
-				for (Coordinate coordinate : shortest.keySet()) {
-					if (coordinate.x == end.x && coordinate.y == end.y)
-						ends.add(coordinate);
-				}
-				e = null;
-				for (Coordinate coordinate : ends) {
-					if(shortest.get(coordinate) == minimum)
-						e = coordinate;
-				}
-				if (shortest.get(e) != null) {
-					current = e; 
-					path.put(current, shortest.get(current));
-
-					while (current.prev != null) {
-						current = current.prev;
-						path.put(current, shortest.get(current));
-					}	
-				}
-			}
-		}
-
-		for (Coordinate i : path.keySet()) {
+		
+		for (Coordinate i : path) {
 			grid[i.x][i.y] = 'ö';				
 		}
+
+		int count = 0; 
 		for(int i = 0; i < grid.length; i++) {
 			for(int j = 0; j < grid[0].length; j++) {
-				if (grid[i][j] == 'ö')
+				if(grid[i][j] == 'ö')
 					count++;
+	//			System.out.print(grid[i][j]);
 			}
+		//	System.out.println();
 		}
 
-		/*		for(int i = 0; i < grid.length; i++) {
 
-				for(int j = 0; j < grid[0].length; j++) {
-					System.out.print(grid[i][j]);
-			}
-			System.out.println();
-		}*/
+
 
 		stopTime = System.currentTimeMillis();
-		System.out.println("Day Sixteen, Part Two: " + count);
+		System.out.println("Day Sixteen, Part Two - again: " + count);
 		System.out.println("Time in ms " + (stopTime - startTime));
+
+
 	}
 
-	static Map<Coordinate, Integer> djikstra(Graph graph, int startCost, Coordinate start, Coordinate destination, int minimum) {
+	static Coordinate destination = null;
+	static Map<Coordinate, Integer> djikstra(Graph graph, Coordinate start, Coordinate end) {
 		Queue<Coordinate> queue = new PriorityQueue<Coordinate>();
 		queue.add(start);
 		Map<Coordinate, Integer> pathWithCost = new HashMap<Coordinate, Integer>();
-		pathWithCost.put(start, startCost);
+		pathWithCost.put(start, 0);
 		start.prev = null;
 
 		while(!queue.isEmpty()) {
 			Coordinate current = queue.poll(); 
-			if (pathWithCost.get(current) <= minimum) {
 
-				if(current.x == destination.x && current.y == destination.y)
-					return pathWithCost;
+			Coordinate nextNeigh = graph.getNeighbours(current);
+			List<Coordinate> rotation = graph.getRotation(current);
 
-				Coordinate neighbours = graph.getNeighbours(current);
-				List<Coordinate> rotation = graph.getRotation(current);
-
-				if (neighbours != null) {
-					int neighdistance = pathWithCost.get(current) + 1;
-					if(!pathWithCost.containsKey(neighbours) || neighdistance < pathWithCost.get(neighbours)) {
-						pathWithCost.put(neighbours, neighdistance);
-						neighbours.cost = neighdistance;
-						queue.add(neighbours);
-						neighbours.prev = current;
-					}
+			if (current.x == end.x && current.y == end.y)
+				destination = current;
+			if (nextNeigh != null) {
+				int nextcost = pathWithCost.get(current) + 1;
+				if(!pathWithCost.containsKey(nextNeigh) || nextcost <= pathWithCost.get(nextNeigh)) {
+					pathWithCost.put(nextNeigh, nextcost);
+					queue.add(nextNeigh);
+					nextNeigh.cost = nextcost;
+					nextNeigh.prev = current;
+					nextNeigh.prevs.add(current);
 				}
-				for(Coordinate next : rotation) {
-					int newcost = pathWithCost.get(current) + 1000;
-					if(!pathWithCost.containsKey(next) || newcost < pathWithCost.get(next)) {
-						pathWithCost.put(next, newcost);
-						queue.add(next);
-						next.cost = newcost;
-						next.prev = current;
-					}
-				}
+			}
+			for(Coordinate next : rotation) {
+				int newcost = pathWithCost.get(current) + 1000;
+				if(!pathWithCost.containsKey(next) || newcost <= pathWithCost.get(next)) { 
+					pathWithCost.put(next, newcost);
+					queue.add(next);
+					next.cost = newcost; 
+					next.prev = current;
+					next.prevs.add(current);
+				} 
 			}
 		}
 		return pathWithCost;	
@@ -200,21 +156,24 @@ public class DaySixteen {
 		Direction direction = Direction.NONE; 
 		Coordinate prev = null; 
 		int cost; 
-		List<Coordinate> prevs = new ArrayList<Coordinate>();
-
+		Set<Coordinate> prevs;
+ 
 		Coordinate(int i, int j) {
 			this.x = i;
 			this.y = j;
+			this.prevs = new HashSet<Coordinate>();
 		}
 		Coordinate(int i, int j, Direction d) {
 			this.x = i;
 			this.y = j;
 			this.direction = d; 
+			this.prevs = new HashSet<Coordinate>();
 		}
 		Coordinate(int i, int j, Direction d, int c) {
 			this.x = i;
 			this.y = j;
 			this.direction = d;
+			this.prevs = new HashSet<Coordinate>();
 		}
 
 		int getX() {
@@ -255,11 +214,41 @@ public class DaySixteen {
 	static class Graph {
 		List<Coordinate> obstacle; 
 		int[][] grid; 
+		List<Coordinate> allCoords;
 
 		Graph(int h, int w, List<Coordinate> obstacles) {
 			this.grid = new int[h][w];	
 			this.obstacle = obstacles;
+			this.allCoords = new ArrayList<Coordinate>();
+			establishGraph();
 		}
+		
+		Coordinate getCoordinate(Coordinate c) {
+			for (Coordinate coordinate : this.allCoords) {
+				if (coordinate.equals(c))
+					return coordinate;
+			}
+			return null;
+		}
+	
+		void establishGraph() {
+			for(int i = 0; i < this.grid.length; i++) {
+				for(int j = 0; j < this.grid[0].length; j++) {
+					Coordinate c = new Coordinate(i, j);
+					if (passable(c)) {
+						Coordinate n = new Coordinate(c.getX(), c.getY(), Direction.NORTH);
+						Coordinate e = new Coordinate(c.getX(), c.getY(), Direction.EAST);
+						Coordinate s = new Coordinate(c.getX(), c.getY(), Direction.SOUTH);
+						Coordinate w = new Coordinate(c.getX(), c.getY(), Direction.WEST);
+						this.allCoords.add(n);
+						this.allCoords.add(e);
+						this.allCoords.add(s);
+						this.allCoords.add(w);
+					}
+				}	
+			}
+		}
+		
 		boolean inBounds(Coordinate c) {
 			return (c.getX() >= 0 && c.getX() < this.grid.length) && (c.getY() >= 0 && c.getY() < this.grid[0].length);
 		}
@@ -274,49 +263,58 @@ public class DaySixteen {
 				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
 				if(inBounds(e) && passable(e) && !path.containsKey(e)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.WEST)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.EAST)); 
+						rotate.add(getCoordinate(c.x, c.y, Direction.EAST)); 
 				}
 				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
 				if(inBounds(w) && passable(w) && !path.containsKey(w)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.EAST)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.WEST)); 
+						rotate.add(getCoordinate(c.x, c.y, Direction.WEST)); 
 				}
 			} else if(c.direction.equals(Direction.SOUTH)) {
 				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
 				if(inBounds(e) && passable(e) && !path.containsKey(e)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.WEST)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.EAST)); 
+						rotate.add(getCoordinate(c.x, c.y, Direction.EAST)); 
 				}
 				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
 				if(inBounds(w) && passable(w) && !path.containsKey(w)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.EAST)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.WEST)); 
+						rotate.add(getCoordinate(c.x, c.y, Direction.WEST)); 
 				}
 			} else if(c.direction.equals(Direction.EAST)) {
 				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
 				if(inBounds(n) && passable(n) && !path.containsKey(n)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.SOUTH)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.NORTH));
+						rotate.add(getCoordinate(c.x, c.y, Direction.NORTH));
 				}
 				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
 				if(inBounds(s) && passable(s) && !path.containsKey(s)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.NORTH)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.SOUTH));
+						rotate.add(getCoordinate(c.x, c.y, Direction.SOUTH));
 				}
 			}  else if(c.direction.equals(Direction.WEST)) {
 				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
 				if(inBounds(n) && passable(n) && !path.containsKey(n)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.SOUTH)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.NORTH));
+						rotate.add(getCoordinate(c.x, c.y, Direction.NORTH));
 				}
 				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
 				if(inBounds(s) && passable(s) && !path.containsKey(s)) {
 					if(!path.containsKey(new Coordinate(c.x, c.y, Direction.NORTH)))
-						rotate.add(new Coordinate(c.x, c.y, Direction.SOUTH));
+						rotate.add(getCoordinate(c.x, c.y, Direction.SOUTH));
 				}
 			}
 			return rotate;
 
+		}
+
+		Coordinate getCoordinate(int x, int y, Direction dir) {
+			Coordinate c = new Coordinate(x, y, dir);
+			for (Coordinate coordinate : this.allCoords) {
+				if (coordinate.equals(c))
+					return coordinate;
+			}
+			return null;
 		}
 
 		List<Coordinate> getRotation(Coordinate c) {
@@ -325,17 +323,17 @@ public class DaySixteen {
 			if(c.direction.equals(Direction.NORTH) || c.direction.equals(Direction.SOUTH)) {
 				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
 				if(inBounds(e) && passable(e))
-					rotate.add(new Coordinate(c.x, c.y, Direction.EAST));
+					rotate.add(getCoordinate(c.x, c.y, Direction.EAST));
 				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
 				if(inBounds(w) && passable(w))
-					rotate.add(new Coordinate(c.x, c.y, Direction.WEST));
+					rotate.add(getCoordinate(c.x, c.y, Direction.WEST));
 			} else if(c.direction.equals(Direction.EAST) || c.direction.equals(Direction.WEST)) {
 				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
 				if(inBounds(n) && passable(n))
-					rotate.add(new Coordinate(c.x, c.y, Direction.NORTH));
+					rotate.add(getCoordinate(c.x, c.y, Direction.NORTH));
 				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
 				if(inBounds(s) && passable(s))
-					rotate.add(new Coordinate(c.x, c.y, Direction.SOUTH));
+					rotate.add(getCoordinate(c.x, c.y, Direction.SOUTH));
 			}
 			return rotate;
 		}
@@ -344,19 +342,19 @@ public class DaySixteen {
 			if(c.direction.equals(Direction.NORTH)) {
 				Coordinate n = new Coordinate(c.getX() - 1, c.getY(), Direction.NORTH);
 				if(inBounds(n) && passable(n)) 
-					return n;  		
+					return getCoordinate(n);  		
 			} else if(c.direction.equals(Direction.EAST)) {
 				Coordinate e = new Coordinate(c.getX(), c.getY() + 1, Direction.EAST);
 				if(inBounds(e) && passable(e))
-					return e; 		
+					return getCoordinate(e); 		
 			} else if(c.direction.equals(Direction.SOUTH)) {
 				Coordinate s = new Coordinate(c.getX() + 1, c.getY(), Direction.SOUTH);
 				if(inBounds(s) && passable(s)) 
-					return s; 		
+					return getCoordinate(s); 		
 			} else if(c.direction.equals(Direction.WEST)) {
 				Coordinate w = new Coordinate(c.getX(), c.getY() - 1, Direction.WEST);
 				if(inBounds(w) && passable(w)) 
-					return w;  			
+					return getCoordinate(w);  			
 			}
 			return null;
 		}

@@ -100,17 +100,11 @@ public class DayTwentyTwo {
 			this.p4 = p4;
 			this.cost = 0; 
 		}
-
 		void setCost(int n) {
-			System.out.println("BEFORE"+ cost);
-
 			this.cost += n;
-			System.out.println("COST AFTER "+ cost);
 		}
-
 		public String toString() {
 			return this.p1 + " " + this.p2 + " " + this.p3 + " " + this.p4;
-
 		}
 
 		@Override

@@ -241,4 +241,133 @@ public class PathfindingAlg<T> {
 	}*/ 
 
 
+	
+	
+	
+	
+	
+	// Djikstra all paths: 
+//	check possibly 2024 day 16 for more info maybe
+	/*
+	 * reconstruct ALL paths:
+	 * 
+	 *  Set<Coordinate> path = new HashSet<Coordinate>();
+		Queue<Coordinate> q = new PriorityQueue<Coordinate>();
+		
+		Set<Coordinate> visited = new HashSet<Coordinate>();
+		
+		
+		
+		q.add(dest);
+		while(!q.isEmpty()) {
+			Coordinate current = q.poll();
+			visited.add(current);
+			path.add(current);
+			
+			if(allCoords.get(current) != null) {
+				for (Coordinate coordinate : allCoords.get(current)) {
+					if (!visited.contains(coordinate))
+						q.add(coordinate);
+				}
+			}
+			current = current.prev;
+		}
+
+	 * 
+	 * 
+
+		Queue<Coordinate> q = new PriorityQueue<Coordinate>();
+		q.add(destinationMin);
+		while(!q.isEmpty()) {
+			Coordinate current = q.poll();
+			if(!set.contains(current)) {
+				if (current.cost <= minimum) {
+					set.add(current);
+					for (Coordinate coordinate : current.prevs) {
+						if (coordinate.cost <= minimum) {
+							q.add(coordinate);
+						}
+					}
+				}
+			}
+		}
+
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	
+	static Coordinate destinationMin = null;
+	static Map<Coordinate, Integer> djikstra(Graph graph, Coordinate start, Coordinate destination) {
+		Queue<Coordinate> queue = new PriorityQueue<Coordinate>();
+		queue.add(start);
+		Map<Coordinate, Integer> pathWithCost = new HashMap<Coordinate, Integer>();
+
+		pathWithCost.put(start, 0);
+		start.prev = null;
+
+		while(!queue.isEmpty()) {
+			Coordinate current = queue.poll(); 
+
+			if(current.x == destination.x && current.y == destination.y) {
+				destinationMin = current; 
+				return pathWithCost;
+			}
+
+			Coordinate neighbours = graph.getNeighbours(current);
+			List<Coordinate> rotation = graph.getRotation(current);
+
+			if (neighbours != null) {
+				int neighdistance = pathWithCost.get(current) + 1;
+				if(!pathWithCost.containsKey(neighbours) || neighdistance <= pathWithCost.get(neighbours)) {
+					pathWithCost.put(neighbours, neighdistance);
+					queue.add(neighbours);
+					neighbours.cost = neighdistance;
+					neighbours.prev = current;
+					neighbours.prevs.add(current);	
+				} 
+			}
+
+			for(Coordinate next : rotation) {
+				int newcost = pathWithCost.get(current) + 1000;
+				if(!pathWithCost.containsKey(next) || newcost <= pathWithCost.get(next)) { 
+					pathWithCost.put(next, newcost);
+					queue.add(next);
+					next.cost = newcost;
+					next.prev = current;										
+					next.prevs.add(current);
+				}
+
+			}
+		}
+		return pathWithCost;	
+	}
+*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
