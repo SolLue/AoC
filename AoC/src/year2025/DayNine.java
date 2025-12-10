@@ -25,14 +25,14 @@ public class DayNine {
 		br.close();
 
 		long startTime = System.currentTimeMillis();
-
+		
 		List<Coordinates> coords = new ArrayList<Coordinates>();
 		for (String string : input) {
 			String[] arr = string.split(",");
 			Coordinates c = new Coordinates(Long.parseLong(arr[0]), Long.parseLong(arr[1]));
 			coords.add(c);
 		}
-		
+
 		Set<Rectangle> possibleRec = new HashSet<Rectangle>();
 		for (int i = 0; i < coords.size(); i++) {
 			for (int j = 0; j < coords.size(); j++) {
