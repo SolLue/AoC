@@ -37,6 +37,20 @@ public class PathfindingAlg<T> {
 		return p; 
 	}
 
+	// Year 2025 Day 11
+	/*
+	static long findPaths(List<Device> devices, Device from) {
+        if (from.name.equals("out"))
+            return 1;
+  
+        long found = 0;
+        for (Device out : from.getOutput(devices)) {
+            found += findPaths(devices, out);
+        }
+        return found;
+    }*/
+	
+	
 	public List<Map<Node, Integer>> getAllPaths(GraphWeighted graph, Node source, int steps) { 
 		List<Map<Node, Integer>> paths = new ArrayList<Map<Node, Integer>>();
 		recursiveGetPaths(graph, source, paths, new LinkedHashMap<Node, Integer>(), steps, 0, 0); //destination, paths, new LinkedHashSet<Node>());
