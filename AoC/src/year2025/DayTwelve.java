@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import utility.Property;
@@ -51,9 +50,7 @@ public class DayTwelve {
 				char[][] current = presents.get(i);
 				int space = 0; 
 				space += getAreaFromPresent(current);
-				total += space * amount; 
-			
-			
+				total += space * amount; 			
 			}
 			
 			if (total <= (width * height))
@@ -66,7 +63,6 @@ public class DayTwelve {
 
 		startTime = System.currentTimeMillis();
 
-		
 		
 		stopTime = System.currentTimeMillis();
 		System.out.println("Day Twelve, Part Two: " + "over way too early - understandable but still sad :c ");
